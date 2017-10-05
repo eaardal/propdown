@@ -1,10 +1,7 @@
 {
-  "name": "spv-propdown",
+  "name": "propdown",
   "version": "1.0.0",
   "main": "lib/index.js",
-  "publishConfig": {
-    "registry": "http://packages.spvdev.no/npm/npm"
-  },
   "scripts": {
     "start": "npm run babel -- -w",
     "test": "npm run eslint && npm run jest",
@@ -29,11 +26,8 @@
     "chalk": "^2.1.0",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^15.1.0",
-    "eslint-config-spv": "^4.1.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jest": "^20.0.3",
-    "eslint-plugin-jsx-a11y": "^5.1.1",
-    "eslint-plugin-react": "^7.3.0",
     "jest": "^21.1.0",
     "react-docgen": "^2.18.0",
     "react-docgen-markdown-renderer": "^1.0.1",
