@@ -1,0 +1,37 @@
+{
+  "name": "spv-propdown",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "publishConfig": {
+    "registry": "http://packages.spvdev.no/npm/npm"
+  },
+  "scripts": {
+    "start": "npm run babel -- -w",
+    "test": "npm run eslint && npm run jest",
+    "test:watch": "npm run jest:watch",
+    "jest:watch": "npm run jest -- --watch",
+    "jest:coverage": "npm run jest -- --coverage",
+    "jest:watchall": "npm run jest -- --watchAll",
+    "babel": "babel src --out-dir lib --ignore *spec.js",
+    "clean": "rm -rf lib/",
+    "build": "npm run eslint && npm run clean && npm run babel --",
+    "build:sourcemaps": "npm run build -- --source-maps inline",
+    "eslint": "eslint src/**/*.js* test/**/*.js",
+    "jest": "jest --config=jest.json",
+    "prepublish": "npm run build"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^7.2.3",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-config-spv": "^4.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jest": "^20.0.3",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
+    "eslint-plugin-react": "^7.3.0",
+    "jest": "^21.1.0"
+  }
+}
