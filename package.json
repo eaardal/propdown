@@ -4,7 +4,7 @@
   "main": "lib/index.js",
   "scripts": {
     "start": "npm run babel -- -w",
-    "start2": "babel-node src/index.js",
+    "main": "babel-node src/index.js",
     "test": "npm run eslint && npm run jest",
     "test:watch": "npm run jest:watch",
     "jest:watch": "npm run jest -- --watch",
