@@ -2,59 +2,74 @@
 /* eslint-disable no-console */
 
 import path from 'path';
-import { parse as parseReactDocs } from 'react-docgen';
-import ReactDocGenMarkdownRenderer from 'react-docgen-markdown-renderer';
 import chalk from 'chalk';
 import argv from 'argv';
 import fs from './filesystemHelper';
+import parser from './parser';
 
-console.log('ARGS', argv);
+const JSX = '.jsx';
 
-const renderer = new ReactDocGenMarkdownRenderer({
-  componentsBasePath: __dirname,
-});
-
-const srcDirectory = path.resolve(__dirname, 'src');
-
-const documentationDirectoryPath = path.resolve('docs');
-fs.createDirectoryIfNotExists(documentationDirectoryPath);
-
-const failedFiles = [];
-
-const processFiles = (err, files) => {
+const processReadFiles = (outputDirectory, failedFiles) => (err, files) => {
   files.forEach((file) => {
     console.log(`${chalk.blue('Processing file')} ${chalk.cyan(file)}`);
 
-    const content = fs.readFile(file);
-    const documentName = `${path.basename(file, path.extname(file))}${renderer.extension}`;
+    const documentName = `${path.basename(file, path.extname(file))}${JSX}`;
+    const { ok, content, error } = parser.parseContent(file);
 
-    try {
-      const doc = parseReactDocs(content);
-
-      const documentContent = renderer.render(
-        /* The path to the component, used for linking to the file. */
-        file,
-        /* The actual react-docgen AST */
-        doc,
-        /* Array of component ASTs that this component composes */
-        [],
-      );
-
-      fs.writeFile(documentationDirectoryPath, documentName, documentContent);
-    } catch (e) {
-      failedFiles.push({ file, error: e });
+    if (ok) {
+      fs.writeFile(outputDirectory, documentName, content);
+    } else {
+      failedFiles.push(error);
     }
   });
 };
 
-fs.getFilesInSubDiretoriesRecursive(srcDirectory, processFiles, '.jsx');
-
-if (failedFiles.length > 0) {
+const processFailedFiles = (failedFiles, outputDirectory) => {
   fs.createFileIfNotExists(
-    documentationDirectoryPath,
+    outputDirectory,
     '_errors.txt',
     JSON.stringify(failedFiles, null, 2),
   );
 
-  console.log(`${chalk.yellow(failedFiles.length)} ${chalk.red(`files failed. See ${path.resolve(documentationDirectoryPath, '_errors.txt')} for details`)}`);
-}
+  console.log(`${chalk.yellow(failedFiles.length)} ${chalk.red(`files failed. See ${path.resolve(outputDirectory, '_errors.txt')} for details`)}`);
+};
+
+const parseArgs = () =>
+  argv.option({
+    name: 'src',
+    short: 's',
+    type: 'string',
+    description: 'The source folder to recursively look for JSX files',
+  }).option({
+    name: 'out',
+    short: 'o',
+    type: 'string',
+    description: 'The directory to put processed markdown',
+  }).run();
+
+const getOptions = () => {
+  const args = parseArgs();
+  return {
+    outDirectory: args.options.out || 'docs',
+    srcDirectory: args.options.src || 'src',
+  };
+};
+
+const main = () => {
+  const options = getOptions();
+
+  const outDirectory = path.resolve(options.outDirectory);
+  fs.createDirectoryIfNotExists(outDirectory);
+
+  const failedFiles = [];
+  const processFiles = processReadFiles(outDirectory, failedFiles);
+
+  const srcDirectory = path.resolve(__dirname, options.srcDirectory);
+  fs.getFilesInSubDiretoriesRecursive(srcDirectory, processFiles, JSX);
+
+  if (failedFiles.length > 0) {
+    processFailedFiles(failedFiles, outDirectory);
+  }
+};
+
+main();
