@@ -8,6 +8,7 @@ import fs from './filesystemHelper';
 import parser from './parser';
 
 const JSX = '.jsx';
+const MD = '.md';
 
 const parseArgs = () =>
   argv.option({
@@ -68,7 +69,7 @@ const processReadFiles = outDirectory => (err, files) => {
       console.log(`${chalk.blue('Generating documentation from')} ${chalk.gray(file)}`);
     }
 
-    const documentName = `${path.basename(file, path.extname(file))}${JSX}`;
+    const documentName = `${path.basename(file, path.extname(file))}${MD}`;
     const { ok, content, error } = parser.parseContent(file);
 
     if (ok) {

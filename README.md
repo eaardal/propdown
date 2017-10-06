@@ -10,7 +10,37 @@ npm i -D propdown
 
 ## Use
 
-TBA
+Run with node:
+
+```
+node node_modules/propdown/lib/index.js
+```
+
+### Options
+
+#### `src`
+
+Specify the source directory to recursively search for .jsx files
+
+```
+node node_modules/propdown/lib/index.js --src=my/source/folder
+```
+
+#### `out`
+
+Specify the target directory to put processed markdown files
+
+```
+node node_modules/propdown/lib/index.js --out=my/docs/folder
+```
+
+#### `verbose`
+
+Specify to log more verbosely when running
+
+```
+node node_modules/propdown/lib/index.js --verbose
+```
 
 ## Changelog
 

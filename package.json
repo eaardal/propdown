@@ -32,6 +32,7 @@
   "dependencies": {
     "argv": "0.0.2",
     "chalk": "^2.1.0",
+    "mkdirp": "^0.5.1",
     "react-docgen": "^2.18.0",
     "react-docgen-markdown-renderer": "^1.0.1",
     "recursive-readdir": "^2.2.1"

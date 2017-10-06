@@ -1,10 +1,15 @@
 import fs from 'fs';
 import path from 'path';
+import mkdirp from 'mkdirp';
 import recursiveReadDir from 'recursive-readdir';
 
+const fileExists = file => fs.existsSync(file);
+
+const directoryExists = directory => fs.existsSync(directory);
+
 const createDirectoryIfNotExists = (directory) => {
-  if (!fs.existsSync(directory)) {
-    fs.mkdirSync(directory);
+  if (!directoryExists(directory)) {
+    mkdirp(directory);
   }
 };
 
@@ -16,10 +21,6 @@ const createFileIfNotExists = (directoryPath, fileName, content = '') => {
 };
 
 const deleteFile = filePath => fs.unlinkSync(filePath);
-
-const directoryExists = directory => fs.existsSync(directory);
-
-const fileExists = file => fs.existsSync(file);
 
 const writeFile = (directoryPath, fileName, content, overwrite = false) => {
   createDirectoryIfNotExists(directoryPath);
