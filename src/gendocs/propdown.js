@@ -4,8 +4,8 @@
 import path from 'path';
 import chalk from 'chalk';
 import argv from 'argv';
-import fs from './filesystemHelper';
-import parser from './parser';
+import fs from '../helpers/filesystemHelper';
+import reactDocParser from '../helpers/reactDocParser';
 
 const JSX = '.jsx';
 const MD = '.md';
@@ -33,6 +33,8 @@ const getOptions = () => {
     outDirectory: args.options.out || 'docs',
     srcDirectory: args.options.src || 'src',
     verbose: args.options.verbose || false,
+    indexFileName: args.options.indexFileName || 'index.html',
+    indexTitle: args.options.indexTitle || 'Propdown',
   };
 };
 
@@ -45,18 +47,28 @@ const processFailedFiles = (failedFiles, outDirectory) => {
   );
 };
 
-const processReadFiles = outDirectory => (err, files) => {
+const createComponents = successfulComponents =>
+  successfulComponents.map((comp, index) => ({
+    id: index + 1,
+    title: comp.title,
+    markdown: comp.markdown,
+  }));
+
+const processReadFiles = (outDirectory, resolve, reject) => (err, files) => {
   const failedFiles = [];
-  const successfulFiles = [];
+  const successfulComponents = [];
   const processedFiles = [];
 
   if (err) {
     console.log(`${chalk.red(err)}`);
+    reject(err);
     return;
   }
 
   if (!files || files.length === 0) {
-    console.log(`${chalk.yellow('No files to process')}`);
+    const errorMessage = 'No files to process';
+    console.log(`${chalk.yellow(errorMessage)}`);
+    reject(errorMessage);
     return;
   }
 
@@ -69,14 +81,15 @@ const processReadFiles = outDirectory => (err, files) => {
       console.log(`${chalk.blue('Generating documentation from')} ${chalk.gray(file)}`);
     }
 
-    const documentName = `${path.basename(file, path.extname(file))}${MD}`;
-    const { ok, content, error } = parser.parseContent(file);
+    const fileName = path.basename(file, path.extname(file));
+    const documentName = `${fileName}${MD}`;
+    const { ok, content, error } = reactDocParser.parseContent(file);
 
     if (ok) {
       fs.writeFile(outDirectory, documentName, content, true);
 
       const fullPath = path.resolve(outDirectory, documentName);
-      successfulFiles.push(fullPath);
+      successfulComponents.push({ path: fullPath, markdown: content, title: fileName });
 
       if (options.verbose) {
         console.log(`${chalk.green('Successfully saved to')} ${chalk.gray(fullPath)}`);
@@ -94,8 +107,11 @@ const processReadFiles = outDirectory => (err, files) => {
   }
 
   console.log(`${chalk.yellow(processedFiles.length)} ${chalk.white('files processed')}`);
-  console.log(`${chalk.yellow(successfulFiles.length)} ${chalk.green('files successfully parsed to documentation')}`);
+  console.log(`${chalk.yellow(successfulComponents.length)} ${chalk.green('files successfully parsed to documentation')}`);
   console.log(`${chalk.yellow(failedFiles.length)} ${chalk.red(`files failed. See ${path.resolve(outDirectory, '_errors.txt')} for details`)}`);
+
+  const components = createComponents(successfulComponents);
+  resolve({ components, options });
 };
 
 const main = () => {
@@ -108,9 +124,10 @@ const main = () => {
   fs.createDirectoryIfNotExists(outDirectory);
   console.log(`${chalk.white('Using output directory:')} ${chalk.gray(outDirectory)}`);
 
-  const processFiles = processReadFiles(outDirectory);
-
-  fs.getFilesInSubDiretoriesRecursive(srcDirectory, processFiles, JSX);
+  return new Promise((resolve, reject) => {
+    const processFiles = processReadFiles(outDirectory, resolve, reject);
+    fs.getFilesInSubDiretoriesRecursive(srcDirectory, processFiles, JSX);
+  });
 };
 
 export default main;

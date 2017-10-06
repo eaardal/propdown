@@ -1,3 +1,7 @@
-import main from './main-gendocs';
+import propdown from './gendocs/propdown';
+import indexCompiler from './indexPage/indexCompiler';
 
-main();
+propdown()
+  .then(({ components, options }) => {
+    indexCompiler.compile(components, options);
+  });

@@ -1,6 +1,6 @@
 # Ignore build
 lib/
-
+docs/
 # Other stuff
 node_modules
 

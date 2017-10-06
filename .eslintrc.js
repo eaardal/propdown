@@ -11,5 +11,6 @@ module.exports = {
    'linebreak-style': 0,
    'import/no-extraneous-dependencies': [2, {'devDependencies': true}],
    'import/prefer-default-export': 0,
+   'no-console': 0,
  },
 };
