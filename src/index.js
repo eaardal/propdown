@@ -9,31 +9,6 @@ import parser from './parser';
 
 const JSX = '.jsx';
 
-const processReadFiles = (outputDirectory, failedFiles) => (err, files) => {
-  files.forEach((file) => {
-    console.log(`${chalk.blue('Processing file')} ${chalk.cyan(file)}`);
-
-    const documentName = `${path.basename(file, path.extname(file))}${JSX}`;
-    const { ok, content, error } = parser.parseContent(file);
-
-    if (ok) {
-      fs.writeFile(outputDirectory, documentName, content);
-    } else {
-      failedFiles.push(error);
-    }
-  });
-};
-
-const processFailedFiles = (failedFiles, outputDirectory) => {
-  fs.createFileIfNotExists(
-    outputDirectory,
-    '_errors.txt',
-    JSON.stringify(failedFiles, null, 2),
-  );
-
-  console.log(`${chalk.yellow(failedFiles.length)} ${chalk.red(`files failed. See ${path.resolve(outputDirectory, '_errors.txt')} for details`)}`);
-};
-
 const parseArgs = () =>
   argv.option({
     name: 'src',
@@ -45,6 +20,10 @@ const parseArgs = () =>
     short: 'o',
     type: 'string',
     description: 'The directory to put processed markdown',
+  }).option({
+    name: 'verbose',
+    type: 'bool',
+    description: 'Enable to output more details',
   }).run();
 
 const getOptions = () => {
@@ -52,24 +31,85 @@ const getOptions = () => {
   return {
     outDirectory: args.options.out || 'docs',
     srcDirectory: args.options.src || 'src',
+    verbose: args.options.verbose || false,
   };
+};
+
+const processFailedFiles = (failedFiles, outDirectory) => {
+  fs.writeFile(
+    outDirectory,
+    '_errors.txt',
+    JSON.stringify(failedFiles, null, 2),
+    true,
+  );
+};
+
+const processReadFiles = outDirectory => (err, files) => {
+  const failedFiles = [];
+  const successfulFiles = [];
+  const processedFiles = [];
+
+  if (err) {
+    console.log(`${chalk.red(err)}`);
+    return;
+  }
+
+  if (!files || files.length === 0) {
+    console.log(`${chalk.yellow('No files to process')}`);
+    return;
+  }
+
+  const options = getOptions();
+
+  files.forEach((file) => {
+    processedFiles.push(file);
+
+    if (options.verbose) {
+      console.log(`${chalk.blue('Generating documentation from')} ${chalk.gray(file)}`);
+    }
+
+    const documentName = `${path.basename(file, path.extname(file))}${JSX}`;
+    const { ok, content, error } = parser.parseContent(file);
+
+    if (ok) {
+      fs.writeFile(outDirectory, documentName, content, true);
+
+      const fullPath = path.resolve(outDirectory, documentName);
+      successfulFiles.push(fullPath);
+
+      if (options.verbose) {
+        console.log(`${chalk.green('Successfully saved to')} ${chalk.gray(fullPath)}`);
+      }
+    } else {
+      if (options.verbose) {
+        console.log(`${chalk.red('Failed to process')} ${chalk.gray(error.filePath)}`);
+      }
+      failedFiles.push(error);
+    }
+  });
+
+  if (failedFiles.length > 0) {
+    processFailedFiles(failedFiles, outDirectory);
+  }
+
+  console.log(`${chalk.yellow(processedFiles.length)} ${chalk.white('files processed')}`);
+  console.log(`${chalk.yellow(successfulFiles.length)} ${chalk.green('files successfully parsed to documentation')}`);
+  console.log(`${chalk.yellow(failedFiles.length)} ${chalk.red(`files failed. See ${path.resolve(outDirectory, '_errors.txt')} for details`)}`);
 };
 
 const main = () => {
   const options = getOptions();
 
+  const srcDirectory = path.resolve(options.srcDirectory);
+  console.log(`${chalk.white('Using source directory:')} ${chalk.gray(srcDirectory)}`);
+
   const outDirectory = path.resolve(options.outDirectory);
   fs.createDirectoryIfNotExists(outDirectory);
+  console.log(`${chalk.white('Using output directory:')} ${chalk.gray(outDirectory)}`);
 
-  const failedFiles = [];
-  const processFiles = processReadFiles(outDirectory, failedFiles);
+  const processFiles = processReadFiles(outDirectory);
 
-  const srcDirectory = path.resolve(__dirname, options.srcDirectory);
   fs.getFilesInSubDiretoriesRecursive(srcDirectory, processFiles, JSX);
-
-  if (failedFiles.length > 0) {
-    processFailedFiles(failedFiles, outDirectory);
-  }
 };
 
 main();

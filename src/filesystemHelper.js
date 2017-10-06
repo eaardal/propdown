@@ -15,14 +15,20 @@ const createFileIfNotExists = (directoryPath, fileName, content = '') => {
   }
 };
 
+const deleteFile = filePath => fs.unlinkSync(filePath);
+
 const directoryExists = directory => fs.existsSync(directory);
 
 const fileExists = file => fs.existsSync(file);
 
-const writeFile = (directoryPath, fileName, content) => {
+const writeFile = (directoryPath, fileName, content, overwrite = false) => {
   createDirectoryIfNotExists(directoryPath);
 
   const fullPath = path.resolve(directoryPath, fileName);
+
+  if (overwrite && fileExists(fullPath)) {
+    deleteFile(fullPath);
+  }
 
   fs.writeFileSync(fullPath, content, { encoding: 'utf-8' });
 };
@@ -43,8 +49,6 @@ const isDirectory = directoryOrFilePath =>
 
 const isFile = directoryOrFilePath =>
   isDirectoryOrFile(directoryOrFilePath, stats => stats.isFile());
-
-const deleteFile = filePath => fs.unlinkSync(filePath);
 
 const getFilesInDirectory = (directory) => {
   const directoryContents = fs.readdirSync(directory);

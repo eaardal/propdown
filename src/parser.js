@@ -23,7 +23,7 @@ const parseContent = (filePath) => {
 
     return { ok: true, content: renderedContent, error: null };
   } catch (e) {
-    const error = { filePath, error: e };
+    const error = { filePath, error: e.toString() };
     return { ok: false, content: null, error };
   }
 };
