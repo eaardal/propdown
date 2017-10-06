@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="no-nb">
+  <head>
+    <meta id="mainViewport" name="viewport" content="width=device-width">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Propdown</title>
+    <style>
+      .body {
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+      }
+      .container {
+        height: 100%;
+      }
+      .heading {}
+      .content {
+        display: flex;
+        height: inherit;
+      }
+      .aside {
+        flex-grow: 1;
+        background-color: lightblue;
+      }
+      .main {
+        flex-grow: 4;
+      }
+    </style>
+  </head>
+  <body class="body">
+    <div class="container">
+      <div class="content">
+        <aside class="aside">
+<ul><li>            <a href=c:/comp1.md>Comp1</a>
+</li><li>            <a href=c:/comp2.md>Comp2</a>
+</li><li>            <a href=c:/comp3.md>Comp3</a>
+</li></ul>        </aside>
+        <main class="main">
+          <p>main</p>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

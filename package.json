@@ -10,6 +10,8 @@
   "scripts": {
     "start": "npm run babel -- -w",
     "main": "babel-node src/index.js",
+    "main-hbs": "babel-node src/main-hbs.js",
+    "watch-hbs": "nodemon -e js,hbs --exec npm run main-hbs",
     "test": "npm run eslint && npm run jest",
     "test:watch": "npm run jest:watch",
     "jest:watch": "npm run jest -- --watch",
@@ -32,11 +34,13 @@
     "eslint-config-airbnb-base": "^12.0.2",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jest": "^21.2.0",
-    "jest": "^21.2.1"
+    "jest": "^21.2.1",
+    "nodemon": "^1.12.1"
   },
   "dependencies": {
     "argv": "0.0.2",
     "chalk": "^2.1.0",
+    "handlebars": "^4.0.10",
     "mkdirp": "^0.5.1",
     "react-docgen": "^2.18.0",
     "react-docgen-markdown-renderer": "^1.0.1",
