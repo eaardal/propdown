@@ -7,7 +7,7 @@ const fileExists = file => fs.existsSync(file);
 
 const directoryExists = directory => fs.existsSync(directory);
 
-const createDirectoryIfNotExists = (directory) => {
+const createDirectoryIfNotExists = directory => {
   if (!directoryExists(directory)) {
     mkdirp(directory);
   }
@@ -51,21 +51,45 @@ const isDirectory = directoryOrFilePath =>
 const isFile = directoryOrFilePath =>
   isDirectoryOrFile(directoryOrFilePath, stats => stats.isFile());
 
-const getFilesInDirectory = (directory) => {
+const getFilesInDirectory = directory => {
   const directoryContents = fs.readdirSync(directory);
-  return directoryContents.filter((dirOrFile) => {
+  return directoryContents.filter(dirOrFile => {
     const fullPath = path.join(directory, dirOrFile);
     return isFile(fullPath);
   });
 };
 
-const getFilesInSubDiretoriesRecursive = (directory, onCompleted, extensionToInclude) => {
+const getFilesInSubDiretoriesRecursive = (
+  directory,
+  onCompleted,
+  extensionToInclude,
+  filesToIgnore
+) => {
   const ignore = (file, stats) =>
-    (extensionToInclude
+    extensionToInclude
       ? !stats.isDirectory() && path.extname(file) !== extensionToInclude
-      : false);
+      : false;
 
-  recursiveReadDir(directory, [ignore], onCompleted);
+  recursiveReadDir(directory, [ignore, ...filesToIgnore], onCompleted);
+};
+
+const getFilesInSubDiretoriesRecursiveSync = (dir, filelist) => {
+  // Thanks to kethinov: https://gist.github.com/kethinov/6658166
+  const files = fs.readdirSync(dir);
+  // eslint-disable-next-line no-param-reassign
+  filelist = filelist || [];
+  files.forEach(file => {
+    if (fs.statSync(path.join(dir, file)).isDirectory()) {
+      // eslint-disable-next-line no-param-reassign
+      filelist = getFilesInSubDiretoriesRecursiveSync(
+        path.join(dir, file),
+        filelist
+      );
+    } else {
+      filelist.push(path.join(dir, file));
+    }
+  });
+  return filelist;
 };
 
 const renameFile = (sourcePath, destinationPath) =>
@@ -82,5 +106,6 @@ export default {
   deleteFile,
   getFilesInDirectory,
   getFilesInSubDiretoriesRecursive,
+  getFilesInSubDiretoriesRecursiveSync,
   renameFile,
 };

@@ -1,14 +1,8 @@
 /* eslint-disable global-require */
 
 module.exports = wallaby => ({
-  files: [
-    'src/**/*.js*',
-    '!src/**/__tests__/*.js',
-    'jest.json',
-  ],
-  tests: [
-    'src/**/__tests__/*.js',
-  ],
+  files: ['src/**/*.js*', '!src/**/__tests__/*.js', 'jest.json'],
+  tests: ['src/**/__tests__/*.js'],
   env: {
     type: 'node',
     runner: 'node',

@@ -1,7 +1,5 @@
 {
-  "modulePaths": [
-    "src"
-  ],
+  "modulePaths": ["src"],
   "collectCoverageFrom": [
     "src/**/*.{js,jsx}",
     "!src/**/*.stories.{js,jsx}",

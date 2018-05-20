@@ -5,3 +5,6 @@ lib/
 node_modules
 
 *.tgz
+
+.vscode/
+docs/

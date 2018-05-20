@@ -1,15 +1,16 @@
 module.exports = {
-  extends: ['airbnb-base', 'plugin:jest/recommended'],
+  extends: ['airbnb-base', 'plugin:jest/recommended', 'prettier'],
+  parser: 'babel-eslint',
   env: {
-    jest: true
+    jest: true,
   },
   globals: {
-    document: true
+    document: true,
   },
-  plugins: ['jest'],
+  plugins: ['jest', 'prettier'],
   rules: {
-   'linebreak-style': 0,
-   'import/no-extraneous-dependencies': [2, {'devDependencies': true}],
-   'import/prefer-default-export': 0,
- },
+    'linebreak-style': 0,
+    'import/no-extraneous-dependencies': [2, { devDependencies: true }],
+    'import/prefer-default-export': 0,
+  },
 };

@@ -42,6 +42,17 @@ Specify to log more verbosely when running
 node node_modules/propdown/lib/index.js --verbose
 ```
 
+#### `indexFilePath`
+
+* path of file to use as index for generated docs
+
+#### `ignoreFiles`
+
+* wildcard works
+* path is not necessary
+* must include extension
+* comma separator
+
 ## Changelog
 
 See [Changelog](./CHANGELOG.md)
